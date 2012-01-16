@@ -1,0 +1,10 @@
+{
+  "name": "lin",
+  "description":"LinkedIn-Node library",
+  "author":"Barbara Raitz; braitz@gmail.com",
+  "version": "1.0.0",
+  "main": "./lib/lin.js",
+  "dependencies": {
+      "expresso" : ">= 0.7.3"
+  }
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>  <html> <head>   <title>newsAPI.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="groupsAPI.html">                 groupsAPI.js               </a>                                           <a class="source" href="industriesAPI.html">                 industriesAPI.js               </a>                                           <a class="source" href="newsAPI.html">                 newsAPI.js               </a>                                           <a class="source" href="peopleAPI.html">                 peopleAPI.js               </a>                                           <a class="source" href="updatesAPI.html">                 updatesAPI.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               newsAPI.js             </h1>             <span class="section">Comments</section>           </th>           <th class="code">             <h1>&nbsp;</h1>             <span class="section">Code</section>           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <div class="">
+
+<p class="first"></p>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">PersonAPI</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./peopleAPI&#39;</span><span class="p">),</span>
+    <span class="nx">QueryString</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;querystring&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">NEWS_RESOURCE</span> <span class="o">=</span> <span class="s2">&quot;news&quot;</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">defaultTopicFields</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="s2">&quot;:(id,title,description,because-of,topic-stories:(topic-articles:(is-read,relevance-data:(global-share-count,in-topic-share-count),article-content,shared-in-network-count,trending-in-entities:(industries:(id,relation-to-viewer)),shared-by-people:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;))))&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">defaultArticleFields</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span>  <span class="s2">&quot;:(is-read,when-saved,relevance-data,article-content,shared-in-network-count,trending-in-entities:(industries:(id,relation-to-viewer)),shared-by-people:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">/*</span>
+  <span class="nx">TopicPath</span><span class="o">:</span>
+  <span class="nx">Retrieve</span> <span class="nx">list</span> <span class="nx">of</span> <span class="nx">topics</span> <span class="nx">based</span> <span class="nx">on</span> <span class="nx">key</span> <span class="p">(</span><span class="nx">where</span> <span class="nx">TopNews</span> <span class="nx">and</span> <span class="nx">Shared</span> <span class="k">return</span> <span class="nx">a</span> <span class="nx">list</span> <span class="nx">of</span> <span class="nx">one</span> <span class="nx">topic</span><span class="p">)</span>
+  <span class="o">*</span>  <span class="nx">topicId</span><span class="o">:</span>  <span class="s2">&quot;id=TOP_NEWS_TODAY&quot;</span> <span class="nx">or</span> <span class="s2">&quot;id=FIRST_DEGREE_NEWS_TODAY&quot;</span><span class="p">,</span> <span class="nx">or</span> <span class="s2">&quot;type=FOLW&quot;</span><span class="p">,</span> <span class="nx">or</span> <span class="nx">actual</span> <span class="nx">topic</span> <span class="nx">id</span>
+  <span class="o">*</span>  <span class="nx">options</span>
+    <span class="o">-</span>  <span class="nx">fields</span><span class="o">:</span> <span class="nx">LinkedIn</span><span class="o">-</span><span class="nx">formatted</span> <span class="nx">string</span> <span class="nx">describing</span> <span class="nx">which</span> <span class="nx">profile</span> <span class="nx">fields</span> <span class="nx">to</span> <span class="nx">retrieve</span><span class="p">.</span>  <span class="nx">see</span> <span class="nx">DEFAULT_TOPIC_FIELDS</span> 
+    <span class="o">-</span>  <span class="nx">start</span>
+    <span class="o">-</span>  <span class="nx">count</span>
+    <span class="o">-</span>  <span class="nx">masSharedByPeopleDegree</span>
+    <span class="o">-</span>  <span class="nx">maxSharedByPeopleC0ount</span>      <span class="err">#</span> <span class="nx">limits</span> <span class="nx">the</span> <span class="nx">member</span> <span class="nx">list</span> <span class="nx">per</span> <span class="nx">article</span> <span class="k">for</span> <span class="nx">members</span> <span class="nx">who</span> <span class="nx">have</span> <span class="nx">shared</span> <span class="nx">an</span> <span class="nx">article</span> <span class="p">(</span><span class="k">default</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="o">-</span>  <span class="nx">maxArticles</span>                  <span class="err">#</span> <span class="nx">max</span> <span class="nx">articles</span> <span class="nx">to</span> <span class="k">return</span> <span class="nx">per</span> <span class="nx">story</span> <span class="p">(</span><span class="k">default</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="o">-</span>  <span class="nx">maxStories</span>                   <span class="err">#</span> <span class="nx">max</span> <span class="nx">stories</span> <span class="nx">to</span> <span class="k">return</span> <span class="nx">per</span> <span class="nx">topic</span> <span class="p">(</span><span class="k">default</span> <span class="mi">100</span><span class="p">)</span>
+<span class="kd">function</span> <span class="nx">topicPath</span><span class="p">(</span><span class="nx">topicId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">options</span><span class="p">)</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/topics/&quot;</span><span class="p">];</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">topicId</span><span class="p">);</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">||</span> <span class="nx">defaultTopicFields</span><span class="p">());</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+  
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;count=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;start=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">);</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-shared-by-people-degree=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxSharedByPeopleDegree</span> <span class="o">||</span> <span class="mi">1</span><span class="p">));</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-shared-by-people=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxSharedByPeopleCount</span> <span class="o">||</span> <span class="mi">1</span><span class="p">));</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-articles=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxArticles</span> <span class="o">||</span> <span class="mi">0</span><span class="p">));</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-stories=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxStories</span><span class="o">||</span> <span class="mi">100</span><span class="p">));</span>
+  
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="k">return</span> <span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  TopNews: </p>
+
+  Retrieve top news topics/articles:</br>
+
+<ul class="star">
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>    fields: LinkedIn-formatted string describing which profile fields to retrieve.  see DEFAULT<em>TOPIC</em>FIELDS </li>
+
+<li>    masSharedByPeopleDegree</li>
+
+<li>    maxSharedByPeopleC0ount      # limits the member list per article for members who have shared an article (default 1)</li>
+
+<li>    maxArticles                  # max articles to return per story (default 1)</li>
+
+<li>    maxStories                   # max stories to return per topic (default 100)</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','topNews',{});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">topNews</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">topicPath</span><span class="p">(</span><span class="s2">&quot;id=TOP_NEWS_TODAY&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  SharedNews:</p>
+
+  Retrieve shared news topics/articles:</br>
+
+<ul class="star">
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>    fields: LinkedIn-formatted string describing which profile fields to retrieve.  see DEFAULT<em>TOPIC</em>FIELDS </li>
+
+<li>    masSharedByPeopleDegree</li>
+
+<li>    maxSharedByPeopleC0ount      # limits the member list per article for members who have shared an article (default 1)</li>
+
+<li>    maxArticles                  # max articles to return per story (default 1)</li>
+
+<li>    maxStories                   # max stories to return per topic (default 100)</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','sharedNews',{});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">sharedNews</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">topicPath</span><span class="p">(</span><span class="s2">&quot;id=FIRST_DEGREE_NEWS_TODAY&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  TopicNews: </p>
+
+  Retrieve articles for topicId</br>
+
+<ul class="star">
+
+<li>  topicId</li>
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>    fields: LinkedIn-formatted string describing which profile fields to retrieve.  see DEFAULT<em>TOPIC</em>FIELDS </li>
+
+<li>    masSharedByPeopleDegree</li>
+
+<li>    maxSharedByPeopleC0ount      # limits the member list per article for members who have shared an article (default 1)</li>
+
+<li>    maxArticles                  # max articles to return per story (default 1)</li>
+
+<li>    maxStories                   # max stories to return per topic (default 100)</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','topicNews','eyJicmVlZCI6IlRvcCIsImFsaWFzIjoiVE9QX1NMSUNFX05FV1NfVE9EQVkgMjgiLCJwZXJpb2QiOiJEYXkiLCJlbnRpdGllcyI6WyJJTkRZXzI4Il19', {});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">topicNews</span><span class="p">(</span><span class="nx">topicId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">topicPath</span><span class="p">(</span><span class="nx">QueryString</span><span class="p">.</span><span class="nx">escape</span><span class="p">(</span><span class="nx">topicId</span><span class="p">),</span> <span class="nx">options</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  FollowedTopics:</p>
+
+  Retrieve list of followed topics</br>
+
+<ul class="star">
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','followedTopics', {count:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">followedTopics</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/topics:(id,title,description,because-of)?type=FOLW&quot;</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;&amp;start=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;&amp;count=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Article:</p>
+
+  Retrieve this article</br>
+
+<ul class="star">
+
+<li>  id:  article id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>  fields</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','article', 5562792952759058434, {fields:":(is-read,when-saved,article-content)"});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">article</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="nx">defaultArticleFields</span><span class="p">();</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;people/~/articles/&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Shares:</p>
+
+  Retrieve this article's recent shares</br>
+
+<ul class="star">
+
+<li>  id:  article id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>  count</li>
+
+<li>  after (timestamp in ms)</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','newsAPI','shares', 5562792952759058434, {count:5});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">shares</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;signal-search&quot;</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;facet=articleID,&quot;</span> <span class="o">+</span> <span class="nx">id</span><span class="p">];</span>
+  <span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">,</span><span class="s1">&#39;after&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">NEWS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="c1">// ====== PUBLIC ==============================================================</span>
+<span class="kd">var</span> <span class="kr">interface</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">defaultTopicFields</span><span class="o">:</span> <span class="nx">defaultTopicFields</span><span class="p">,</span>
+  <span class="nx">topNews</span><span class="o">:</span> <span class="nx">topNews</span><span class="p">,</span>
+  <span class="nx">sharedNews</span><span class="o">:</span> <span class="nx">sharedNews</span><span class="p">,</span>
+  <span class="nx">topicNews</span><span class="o">:</span> <span class="nx">topicNews</span><span class="p">,</span>
+  <span class="nx">followedTopics</span><span class="o">:</span> <span class="nx">followedTopics</span><span class="p">,</span>
+  <span class="nx">article</span><span class="o">:</span> <span class="nx">article</span><span class="p">,</span>
+  <span class="nx">shares</span><span class="o">:</span> <span class="nx">shares</span>
+<span class="p">};</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kr">interface</span><span class="p">;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,0 +1,372 @@
+<!DOCTYPE html>  <html> <head>   <title>industriesAPI.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="groupsAPI.html">                 groupsAPI.js               </a>                                           <a class="source" href="industriesAPI.html">                 industriesAPI.js               </a>                                           <a class="source" href="newsAPI.html">                 newsAPI.js               </a>                                           <a class="source" href="peopleAPI.html">                 peopleAPI.js               </a>                                           <a class="source" href="updatesAPI.html">                 updatesAPI.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               industriesAPI.js             </h1>             <span class="section">Comments</section>           </th>           <th class="code">             <h1>&nbsp;</h1>             <span class="section">Code</section>           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <div class="">
+
+<p class="first"></p>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">PersonAPI</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./peopleAPI&#39;</span><span class="p">);</span>
+
+<span class="c1">// THIS IS HARDCODED TO MATCH LINKEDIN BACKEND!</span>
+<span class="c1">// we can now load this info via:  http://api.linkedin.com/v1/industries?count=100</span>
+<span class="c1">// key = industry id</span>
+<span class="kd">var</span> <span class="nx">INDUSTRY_CATALOG</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="mi">47</span><span class="o">:</span> <span class="s2">&quot;Accounting&quot;</span><span class="p">,</span>
+  <span class="mi">94</span><span class="o">:</span> <span class="s2">&quot;Airlines/Aviation&quot;</span><span class="p">,</span>
+  <span class="mi">120</span><span class="o">:</span><span class="s2">&quot;Alternative Dispute Resolution&quot;</span><span class="p">,</span>
+  <span class="mi">125</span><span class="o">:</span><span class="s2">&quot;Alternative Medicine&quot;</span><span class="p">,</span>
+  <span class="mi">127</span><span class="o">:</span><span class="s2">&quot;Animation&quot;</span><span class="p">,</span>
+  <span class="mi">19</span><span class="o">:</span> <span class="s2">&quot;Apparel &amp; Fashion&quot;</span><span class="p">,</span>
+  <span class="mi">50</span><span class="o">:</span> <span class="s2">&quot;Architecture &amp; Planning&quot;</span><span class="p">,</span>
+  <span class="mi">111</span><span class="o">:</span><span class="s2">&quot;Arts and Crafts&quot;</span><span class="p">,</span>
+  <span class="mi">53</span><span class="o">:</span> <span class="s2">&quot;Automotive&quot;</span><span class="p">,</span>
+  <span class="mi">52</span><span class="o">:</span> <span class="s2">&quot;Aviation &amp; Aerospace&quot;</span><span class="p">,</span>
+  <span class="mi">41</span><span class="o">:</span> <span class="s2">&quot;Banking&quot;</span><span class="p">,</span>
+  <span class="mi">12</span><span class="o">:</span> <span class="s2">&quot;Biotechnology&quot;</span><span class="p">,</span>
+  <span class="mi">36</span><span class="o">:</span> <span class="s2">&quot;Broadcast Media&quot;</span><span class="p">,</span>
+  <span class="mi">49</span><span class="o">:</span> <span class="s2">&quot;Building Materials&quot;</span><span class="p">,</span>
+  <span class="mi">138</span><span class="o">:</span><span class="s2">&quot;Business Supplies and Equipment&quot;</span><span class="p">,</span>
+  <span class="mi">129</span><span class="o">:</span><span class="s2">&quot;Capital Markets&quot;</span><span class="p">,</span>
+  <span class="mi">54</span><span class="o">:</span> <span class="s2">&quot;Chemicals&quot;</span><span class="p">,</span>
+  <span class="mi">90</span><span class="o">:</span> <span class="s2">&quot;Civic &amp; Social Organization&quot;</span><span class="p">,</span>
+  <span class="mi">51</span><span class="o">:</span> <span class="s2">&quot;Civil Engineering&quot;</span><span class="p">,</span>
+  <span class="mi">128</span><span class="o">:</span><span class="s2">&quot;Commercial Real Estate&quot;</span><span class="p">,</span>
+  <span class="mi">118</span><span class="o">:</span><span class="s2">&quot;Computer &amp; Network Security&quot;</span><span class="p">,</span>
+  <span class="mi">109</span><span class="o">:</span><span class="s2">&quot;Computer Games&quot;</span><span class="p">,</span>
+   <span class="mi">3</span><span class="o">:</span> <span class="s2">&quot;Computer Hardware&quot;</span><span class="p">,</span>
+   <span class="mi">5</span><span class="o">:</span> <span class="s2">&quot;Computer Networking&quot;</span><span class="p">,</span>
+   <span class="mi">4</span><span class="o">:</span> <span class="s2">&quot;Computer Software&quot;</span><span class="p">,</span>
+  <span class="mi">48</span><span class="o">:</span> <span class="s2">&quot;Construction&quot;</span><span class="p">,</span>
+  <span class="mi">24</span><span class="o">:</span> <span class="s2">&quot;Consumer Electronics&quot;</span><span class="p">,</span>
+  <span class="mi">25</span><span class="o">:</span> <span class="s2">&quot;Consumer Goods&quot;</span><span class="p">,</span>
+  <span class="mi">91</span><span class="o">:</span> <span class="s2">&quot;Consumer Services&quot;</span><span class="p">,</span>
+  <span class="mi">18</span><span class="o">:</span> <span class="s2">&quot;Cosmetics&quot;</span><span class="p">,</span>
+  <span class="mi">65</span><span class="o">:</span> <span class="s2">&quot;Dairy&quot;</span><span class="p">,</span>
+   <span class="mi">1</span><span class="o">:</span> <span class="s2">&quot;Defense &amp; Space&quot;</span><span class="p">,</span>
+  <span class="mi">99</span><span class="o">:</span> <span class="s2">&quot;Design&quot;</span><span class="p">,</span>
+  <span class="mi">69</span><span class="o">:</span> <span class="s2">&quot;Education Management&quot;</span><span class="p">,</span>
+  <span class="mi">132</span><span class="o">:</span><span class="s2">&quot;E-Learning&quot;</span><span class="p">,</span>
+  <span class="mi">112</span><span class="o">:</span><span class="s2">&quot;Electrical/Electronic Manufacturing&quot;</span><span class="p">,</span>
+  <span class="mi">28</span><span class="o">:</span> <span class="s2">&quot;Entertainment&quot;</span><span class="p">,</span>
+  <span class="mi">86</span><span class="o">:</span> <span class="s2">&quot;Environmental Services&quot;</span><span class="p">,</span>
+  <span class="mi">110</span><span class="o">:</span><span class="s2">&quot;Events Services&quot;</span><span class="p">,</span>
+  <span class="mi">76</span><span class="o">:</span> <span class="s2">&quot;Executive Office&quot;</span><span class="p">,</span>
+  <span class="mi">122</span><span class="o">:</span><span class="s2">&quot;Facilities Services&quot;</span><span class="p">,</span>
+  <span class="mi">63</span><span class="o">:</span> <span class="s2">&quot;Farming&quot;</span><span class="p">,</span>
+  <span class="mi">43</span><span class="o">:</span> <span class="s2">&quot;Financial Services&quot;</span><span class="p">,</span>
+  <span class="mi">38</span><span class="o">:</span> <span class="s2">&quot;Fine Art&quot;</span><span class="p">,</span>
+  <span class="mi">66</span><span class="o">:</span> <span class="s2">&quot;Fishery&quot;</span><span class="p">,</span>
+  <span class="mi">34</span><span class="o">:</span> <span class="s2">&quot;Food &amp; Beverages&quot;</span><span class="p">,</span>
+  <span class="mi">23</span><span class="o">:</span> <span class="s2">&quot;Food Production&quot;</span><span class="p">,</span>
+  <span class="mi">101</span><span class="o">:</span><span class="s2">&quot;Fund-Raising&quot;</span><span class="p">,</span>
+  <span class="mi">26</span><span class="o">:</span> <span class="s2">&quot;Furniture&quot;</span><span class="p">,</span>
+  <span class="mi">29</span><span class="o">:</span> <span class="s2">&quot;Gambling &amp; Casinos&quot;</span><span class="p">,</span>
+  <span class="mi">145</span><span class="o">:</span><span class="s2">&quot;Glass, Ceramics &amp; Concrete&quot;</span><span class="p">,</span>
+  <span class="mi">75</span><span class="o">:</span> <span class="s2">&quot;Government Administration&quot;</span><span class="p">,</span>
+  <span class="mi">148</span><span class="o">:</span><span class="s2">&quot;Government Relations&quot;</span><span class="p">,</span>
+  <span class="mi">140</span><span class="o">:</span><span class="s2">&quot;Graphic Design&quot;</span><span class="p">,</span>
+  <span class="mi">124</span><span class="o">:</span><span class="s2">&quot;Health, Wellness and Fitness&quot;</span><span class="p">,</span>
+  <span class="mi">68</span><span class="o">:</span> <span class="s2">&quot;Higher Education&quot;</span><span class="p">,</span>
+  <span class="mi">14</span><span class="o">:</span> <span class="s2">&quot;Hospital &amp; Health Care&quot;</span><span class="p">,</span>
+  <span class="mi">31</span><span class="o">:</span> <span class="s2">&quot;Hospitality&quot;</span><span class="p">,</span>
+  <span class="mi">137</span><span class="o">:</span><span class="s2">&quot;Human Resources&quot;</span><span class="p">,</span>
+  <span class="mi">134</span><span class="o">:</span><span class="s2">&quot;Import and Export&quot;</span><span class="p">,</span>
+  <span class="mi">88</span><span class="o">:</span> <span class="s2">&quot;Individual &amp; Family Services&quot;</span><span class="p">,</span>
+  <span class="mi">147</span><span class="o">:</span><span class="s2">&quot;Industrial Automation&quot;</span><span class="p">,</span>
+  <span class="mi">84</span><span class="o">:</span> <span class="s2">&quot;Information Services&quot;</span><span class="p">,</span>
+  <span class="mi">96</span><span class="o">:</span> <span class="s2">&quot;Information Technology and Services&quot;</span><span class="p">,</span>
+  <span class="mi">42</span><span class="o">:</span> <span class="s2">&quot;Insurance&quot;</span><span class="p">,</span>
+  <span class="mi">74</span><span class="o">:</span> <span class="s2">&quot;International Affairs&quot;</span><span class="p">,</span>
+  <span class="mi">141</span><span class="o">:</span><span class="s2">&quot;International Trade and Development&quot;</span><span class="p">,</span>
+  <span class="mi">6</span><span class="o">:</span>  <span class="s2">&quot;Internet&quot;</span><span class="p">,</span>
+  <span class="mi">45</span><span class="o">:</span> <span class="s2">&quot;Investment Banking&quot;</span><span class="p">,</span>
+  <span class="mi">46</span><span class="o">:</span> <span class="s2">&quot;Investment Management&quot;</span><span class="p">,</span>
+  <span class="mi">73</span><span class="o">:</span> <span class="s2">&quot;Judiciary&quot;</span><span class="p">,</span>
+  <span class="mi">77</span><span class="o">:</span> <span class="s2">&quot;Law Enforcement&quot;</span><span class="p">,</span>
+  <span class="mi">9</span><span class="o">:</span>  <span class="s2">&quot;Law Practice&quot;</span><span class="p">,</span>
+  <span class="mi">10</span><span class="o">:</span> <span class="s2">&quot;Legal Services&quot;</span><span class="p">,</span>
+  <span class="mi">72</span><span class="o">:</span> <span class="s2">&quot;Legislative Office&quot;</span><span class="p">,</span>
+  <span class="mi">30</span><span class="o">:</span> <span class="s2">&quot;Leisure, Travel &amp; Tourism&quot;</span><span class="p">,</span>
+  <span class="mi">85</span><span class="o">:</span> <span class="s2">&quot;Libraries&quot;</span><span class="p">,</span>
+  <span class="mi">116</span><span class="o">:</span><span class="s2">&quot;Logistics and Supply Chain&quot;</span><span class="p">,</span>
+  <span class="mi">143</span><span class="o">:</span><span class="s2">&quot;Luxury Goods &amp; Jewelry&quot;</span><span class="p">,</span>
+  <span class="mi">55</span><span class="o">:</span> <span class="s2">&quot;Machinery&quot;</span><span class="p">,</span>
+  <span class="mi">11</span><span class="o">:</span> <span class="s2">&quot;Management Consulting&quot;</span><span class="p">,</span>
+  <span class="mi">95</span><span class="o">:</span> <span class="s2">&quot;Maritime&quot;</span><span class="p">,</span>
+  <span class="mi">97</span><span class="o">:</span> <span class="s2">&quot;Market Research&quot;</span><span class="p">,</span>
+  <span class="mi">80</span><span class="o">:</span> <span class="s2">&quot;Marketing and Advertising&quot;</span><span class="p">,</span>
+  <span class="mi">135</span><span class="o">:</span><span class="s2">&quot;Mechanical or Industrial Engineering&quot;</span><span class="p">,</span>
+  <span class="mi">126</span><span class="o">:</span><span class="s2">&quot;Media Production&quot;</span><span class="p">,</span>
+  <span class="mi">17</span><span class="o">:</span> <span class="s2">&quot;Medical Devices&quot;</span><span class="p">,</span>
+  <span class="mi">13</span><span class="o">:</span> <span class="s2">&quot;Medical Practice&quot;</span><span class="p">,</span>
+  <span class="mi">139</span><span class="o">:</span><span class="s2">&quot;Mental Health Care&quot;</span><span class="p">,</span>
+  <span class="mi">71</span><span class="o">:</span> <span class="s2">&quot;Military&quot;</span><span class="p">,</span>
+  <span class="mi">56</span><span class="o">:</span> <span class="s2">&quot;Mining &amp; Metals&quot;</span><span class="p">,</span>
+  <span class="mi">35</span><span class="o">:</span> <span class="s2">&quot;Motion Pictures and Film&quot;</span><span class="p">,</span>
+  <span class="mi">37</span><span class="o">:</span> <span class="s2">&quot;Museums and Institutions&quot;</span><span class="p">,</span>
+  <span class="mi">115</span><span class="o">:</span><span class="s2">&quot;Music&quot;</span><span class="p">,</span>
+  <span class="mi">114</span><span class="o">:</span><span class="s2">&quot;Nanotechnology&quot;</span><span class="p">,</span>
+  <span class="mi">81</span><span class="o">:</span> <span class="s2">&quot;Newspapers&quot;</span><span class="p">,</span>
+  <span class="mi">100</span><span class="o">:</span><span class="s2">&quot;Non-Profit Organization Management&quot;</span><span class="p">,</span>
+  <span class="mi">57</span><span class="o">:</span> <span class="s2">&quot;Oil &amp; Energy&quot;</span><span class="p">,</span>
+  <span class="mi">113</span><span class="o">:</span><span class="s2">&quot;Online Media&quot;</span><span class="p">,</span>
+  <span class="mi">123</span><span class="o">:</span><span class="s2">&quot;Outsourcing/Offshoring&quot;</span><span class="p">,</span>
+  <span class="mi">87</span><span class="o">:</span> <span class="s2">&quot;Package/Freight Delivery&quot;</span><span class="p">,</span>
+  <span class="mi">146</span><span class="o">:</span><span class="s2">&quot;Packaging and Containers&quot;</span><span class="p">,</span>
+  <span class="mi">61</span><span class="o">:</span> <span class="s2">&quot;Paper &amp; Forest Products&quot;</span><span class="p">,</span>
+  <span class="mi">39</span><span class="o">:</span> <span class="s2">&quot;Performing Arts&quot;</span><span class="p">,</span>
+  <span class="mi">15</span><span class="o">:</span> <span class="s2">&quot;Pharmaceuticals&quot;</span><span class="p">,</span>
+  <span class="mi">131</span><span class="o">:</span><span class="s2">&quot;Philanthropy&quot;</span><span class="p">,</span>
+  <span class="mi">136</span><span class="o">:</span><span class="s2">&quot;Photography&quot;</span><span class="p">,</span>
+  <span class="mi">117</span><span class="o">:</span><span class="s2">&quot;Plastics&quot;</span><span class="p">,</span>
+  <span class="mi">107</span><span class="o">:</span><span class="s2">&quot;Political Organization&quot;</span><span class="p">,</span>
+  <span class="mi">67</span><span class="o">:</span> <span class="s2">&quot;Primary/Secondary Education&quot;</span><span class="p">,</span>
+  <span class="mi">83</span><span class="o">:</span> <span class="s2">&quot;Printing&quot;</span><span class="p">,</span>
+  <span class="mi">105</span><span class="o">:</span><span class="s2">&quot;Professional Training &amp; Coaching&quot;</span><span class="p">,</span>
+  <span class="mi">102</span><span class="o">:</span><span class="s2">&quot;Program Development&quot;</span><span class="p">,</span>
+  <span class="mi">79</span><span class="o">:</span> <span class="s2">&quot;Public Policy&quot;</span><span class="p">,</span>
+  <span class="mi">98</span><span class="o">:</span> <span class="s2">&quot;Public Relations and Communications&quot;</span><span class="p">,</span>
+  <span class="mi">78</span><span class="o">:</span> <span class="s2">&quot;Public Safety&quot;</span><span class="p">,</span>
+  <span class="mi">82</span><span class="o">:</span> <span class="s2">&quot;Publishing&quot;</span><span class="p">,</span>
+  <span class="mi">62</span><span class="o">:</span> <span class="s2">&quot;Railroad Manufacture&quot;</span><span class="p">,</span>
+  <span class="mi">64</span><span class="o">:</span> <span class="s2">&quot;Ranching&quot;</span><span class="p">,</span>
+  <span class="mi">44</span><span class="o">:</span> <span class="s2">&quot;Real Estate&quot;</span><span class="p">,</span>
+  <span class="mi">40</span><span class="o">:</span> <span class="s2">&quot;Recreational Facilities and Services&quot;</span><span class="p">,</span>
+  <span class="mi">89</span><span class="o">:</span> <span class="s2">&quot;Religious Institutions&quot;</span><span class="p">,</span>
+  <span class="mi">144</span><span class="o">:</span><span class="s2">&quot;Renewables &amp; Environment&quot;</span><span class="p">,</span>
+  <span class="mi">70</span><span class="o">:</span> <span class="s2">&quot;Research&quot;</span><span class="p">,</span>
+  <span class="mi">32</span><span class="o">:</span> <span class="s2">&quot;Restaurants&quot;</span><span class="p">,</span>
+  <span class="mi">27</span><span class="o">:</span> <span class="s2">&quot;Retail&quot;</span><span class="p">,</span>
+  <span class="mi">121</span><span class="o">:</span><span class="s2">&quot;Security and Investigations&quot;</span><span class="p">,</span>
+  <span class="mi">7</span><span class="o">:</span>  <span class="s2">&quot;Semiconductors&quot;</span><span class="p">,</span>
+  <span class="mi">58</span><span class="o">:</span> <span class="s2">&quot;Shipbuilding&quot;</span><span class="p">,</span>
+  <span class="mi">20</span><span class="o">:</span> <span class="s2">&quot;Sporting Goods&quot;</span><span class="p">,</span>
+  <span class="mi">33</span><span class="o">:</span> <span class="s2">&quot;Sports&quot;</span><span class="p">,</span>
+  <span class="mi">104</span><span class="o">:</span><span class="s2">&quot;Staffing and Recruiting&quot;</span><span class="p">,</span>
+  <span class="mi">22</span><span class="o">:</span> <span class="s2">&quot;Supermarkets&quot;</span><span class="p">,</span>
+  <span class="mi">8</span><span class="o">:</span>  <span class="s2">&quot;Telecommunications&quot;</span><span class="p">,</span>
+  <span class="mi">60</span><span class="o">:</span> <span class="s2">&quot;Textiles&quot;</span><span class="p">,</span>
+  <span class="mi">130</span><span class="o">:</span><span class="s2">&quot;Think Tanks&quot;</span><span class="p">,</span>
+  <span class="mi">21</span><span class="o">:</span> <span class="s2">&quot;Tobacco&quot;</span><span class="p">,</span>
+  <span class="mi">108</span><span class="o">:</span><span class="s2">&quot;Translation and Localization&quot;</span><span class="p">,</span>
+  <span class="mi">92</span><span class="o">:</span> <span class="s2">&quot;Transportation/Trucking/Railroad&quot;</span><span class="p">,</span>
+  <span class="mi">59</span><span class="o">:</span> <span class="s2">&quot;Utilities&quot;</span><span class="p">,</span>
+  <span class="mi">106</span><span class="o">:</span><span class="s2">&quot;Venture Capital &amp; Private Equity&quot;</span><span class="p">,</span>
+  <span class="mi">16</span><span class="o">:</span> <span class="s2">&quot;Veterinary&quot;</span><span class="p">,</span>
+  <span class="mi">93</span><span class="o">:</span> <span class="s2">&quot;Warehousing&quot;</span><span class="p">,</span>
+  <span class="mi">133</span><span class="o">:</span><span class="s2">&quot;Wholesale&quot;</span><span class="p">,</span>
+  <span class="mi">142</span><span class="o">:</span><span class="s2">&quot;Wine and Spirits&quot;</span><span class="p">,</span>
+  <span class="mi">119</span><span class="o">:</span><span class="s2">&quot;Wireless&quot;</span><span class="p">,</span>
+  <span class="mi">103</span><span class="o">:</span><span class="s2">&quot;Writing and Editing&quot;</span>
+<span class="p">};</span>
+
+
+<span class="kd">var</span> <span class="nx">DEFAULT_FIELDS</span> <span class="o">=</span> <span class="s2">&quot;:(id,title,description,because-of,topic-stories:(topic-articles:(is-read,relevance-data:(global-share-count,in-topic-share-count),article-content,shared-in-network-count,trending-in-entities:(industries:(id,relation-to-viewer)),shared-by-people:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;))))&quot;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">INDUSTRY_RESOURCE</span> <span class="o">=</span> <span class="s2">&quot;industry&quot;</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  recommended:  Get recommended industries</p>
+
+<ul class="star">
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>  -start</li>
+
+<li>  -count</li>
+
+</ul>
+
+</ul>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">recommended</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/suggestions/to-follow:(industries:(id,relation-to-viewer))&quot;</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;start=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;count=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">INDUSTRY_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Followed:</p>
+
+  Get followed industries</br>
+
+<ul class="star">
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>  start</li>
+
+<li>  count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','industriesAPI','followed',{count:25});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">followed</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/following/industries&quot;</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;start=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">start</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">)</span> <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;count=&quot;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">INDUSTRY_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <div class="">
+
+<p class="first">  Follow:  </p>
+
+  Follow this industry</br>
+
+<ul class="star">
+
+<li>  id: industry id</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','industriesAPI','follow',6);</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">follow</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;people/~/following/industries&quot;</span><span class="p">,</span> 
+          <span class="nx">body</span><span class="o">:</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;industry&gt;&lt;id&gt;&#39;</span><span class="o">+</span><span class="nx">id</span><span class="o">+</span><span class="s1">&#39;&lt;/id&gt;&lt;/industry&gt;&#39;</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/xml;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">INDUSTRY_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <div class="">
+
+<p class="first">  Unfollow:  </p>
+
+  Unfollow this industry</br>
+
+<ul class="star">
+
+<li>  id: industry id</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','industriesAPI','unfollow',6);</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">unfollow</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;people/~/following/industries/id=&quot;</span> <span class="o">+</span> <span class="nx">id</span><span class="p">,</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">INDUSTRY_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Preview:  </p>
+
+  Preview articles for this industry (similar to showing articles for topic)</br>
+
+<ul class="star">
+
+<li>  id, industryId,  eg: 44</li>
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>     fields: LinkedIn-formatted string describing which profile fields to retrieve.  see DEFAULT<em>TOPIC</em>FIELDS </li>
+
+<li>     :maxStories,   # max stories to return per topic (default 100)</li>
+
+<li>     :maxArticles,  # max articles to return per story (default 1)</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">   <p class="first">Example:</p>
+
+   var Lini = require('lini');</br>
+
+   var api = Lini.api('v1','industriesAPI','preview',6, {maxStories:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">preview</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="nx">DEFAULT_FIELDS</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/topics/industry-id=&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-articles=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxArticles</span> <span class="o">||</span> <span class="mi">0</span><span class="p">));</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;max-stories=&quot;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">maxStories</span><span class="o">||</span> <span class="mi">100</span><span class="p">));</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">INDUSTRY_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <div class="">
+
+<p class="first">  industryName:  </p>
+
+  Get industry name for an industry id</br>
+
+<ul class="star">
+
+<li>  industryId:  eg: 6</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','industriesAPI','industryName',6);</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">industryName</span><span class="p">(</span><span class="nx">industryId</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">INDUSTRY_CATALOG</span><span class="p">[</span><span class="nx">industryId</span><span class="p">];</span>
+<span class="p">}</span>
+
+
+<span class="c1">// ====== PUBLIC ==============================================================</span>
+<span class="kd">var</span> <span class="kr">interface</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">industryName</span><span class="o">:</span> <span class="nx">industryName</span><span class="p">,</span>
+  <span class="nx">recommended</span><span class="o">:</span> <span class="nx">recommended</span><span class="p">,</span>
+  <span class="nx">followed</span><span class="o">:</span> <span class="nx">followed</span><span class="p">,</span>
+  <span class="nx">follow</span><span class="o">:</span> <span class="nx">follow</span><span class="p">,</span>
+  <span class="nx">unfollow</span><span class="o">:</span> <span class="nx">unfollow</span><span class="p">,</span>
+  <span class="nx">preview</span><span class="o">:</span> <span class="nx">preview</span>
+<span class="p">};</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kr">interface</span><span class="p">;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

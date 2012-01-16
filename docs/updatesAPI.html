@@ -1,0 +1,335 @@
+<!DOCTYPE html>  <html> <head>   <title>updatesAPI.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="groupsAPI.html">                 groupsAPI.js               </a>                                           <a class="source" href="industriesAPI.html">                 industriesAPI.js               </a>                                           <a class="source" href="newsAPI.html">                 newsAPI.js               </a>                                           <a class="source" href="peopleAPI.html">                 peopleAPI.js               </a>                                           <a class="source" href="updatesAPI.html">                 updatesAPI.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               updatesAPI.js             </h1>             <span class="section">Comments</section>           </th>           <th class="code">             <h1>&nbsp;</h1>             <span class="section">Code</section>           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <div class="">
+
+<p class="first"></p>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">Querystring</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;querystring&#39;</span><span class="p">),</span>
+    <span class="nx">PersonAPI</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./peopleAPI&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">UPDATE_RESOURCE</span> <span class="o">=</span> <span class="s2">&quot;updates&quot;</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">STANDARD_UPDATE_FIELDS</span> <span class="o">=</span> <span class="s2">&quot;timestamp,update-key,update-type,update-content:(person:(id,first-name,last-name,formatted-name,headline,picture-url,auth-token,distance,connections,current-share,main-address,twitter-accounts,im-accounts,phone-numbers,date-of-birth,member-groups)),updated-fields,is-commentable,update-comments,is-likable,is-liked,num-likes&quot;</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Updates:</p>
+
+  Get network updates for a user</br>
+
+<ul class="star">
+
+<li>  types:  comma-separated list of desired update types, eg: "CONN,PICT,PRFU,JGRP,JOBS,RECU,PRFX,SHAR"</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>  id: retrieve updates for this user </li>
+
+</ul>
+
+</ul>
+
+        note: if not same as logged in user, must set scope to self -- can only view "mefeed" of other users</br>
+
+        if not present, use "~" to indicate self/logged-in-user</br>
+
+<ul class="dash">
+
+<li>  start: 0,</li>
+
+<li>  count:10,</li>
+
+<li>  scope='self'          // if you want MeFeed -- updates that "this user" has sent (not received)</li>
+
+<li>  after=1302552225000,  // optional time filters</li>
+
+<li>  before=1303247798098, // optional time filters</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','updates',{count:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">updates</span><span class="p">(</span><span class="nx">types</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">types</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">options</span><span class="p">)</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/&quot;</span><span class="p">];</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">id</span> <span class="o">||</span> <span class="s2">&quot;~&quot;</span><span class="p">);</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;/network/updates&quot;</span><span class="p">);</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">||</span> <span class="s2">&quot;:(&quot;</span> <span class="o">+</span> <span class="nx">STANDARD_UPDATE_FIELDS</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="nx">types</span> <span class="o">?</span> <span class="nx">types</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">elem</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span><span class="p">(</span><span class="s2">&quot;type=&quot;</span><span class="o">+</span><span class="nx">elem</span><span class="p">);})</span> <span class="o">:</span> <span class="p">[];</span>
+  <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">,</span><span class="s1">&#39;scope&#39;</span><span class="p">,</span><span class="s1">&#39;before&#39;</span><span class="p">,</span><span class="s1">&#39;after&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Likes:</p>
+
+  Get likes for this update</br>
+
+<ul class="star">
+
+<li>  id: network update id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','likes',"UNIU-15003820-5563047074699685888-SHARE",{count:5});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">likes</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/network/updates/key=&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s2">&quot;/likes&quot;</span><span class="p">];</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">||</span> <span class="s2">&quot;:(person:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;))&quot;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Comments:</p>
+
+  Get comments for this update</br>
+
+<ul class="star">
+
+<li>  id: network update id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','comments',"UNIU-15003820-5563047074699685888-SHARE",{count:5});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">comments</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/network/updates/key=&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s2">&quot;/update-comments&quot;</span><span class="p">];</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">||</span> <span class="s2">&quot;:(id,sequence-number,comment,timestamp,person:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;,api-standard-profile-request))&quot;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">);</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="kd">function</span> <span class="nx">htmlEscape</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/&amp;/g</span><span class="p">,</span><span class="s1">&#39;&amp;amp;&#39;</span><span class="p">).</span>
+       <span class="nx">replace</span><span class="p">(</span><span class="sr">/&lt;/g</span><span class="p">,</span><span class="s1">&#39;&amp;lt;&#39;</span><span class="p">).</span>
+       <span class="nx">replace</span><span class="p">(</span><span class="sr">/&gt;/g</span><span class="p">,</span><span class="s1">&#39;&amp;gt;&#39;</span><span class="p">).</span>
+       <span class="nx">replace</span><span class="p">(</span><span class="sr">/&quot;/g</span><span class="p">,</span><span class="s1">&#39;&amp;quot;&#39;</span><span class="p">).</span>
+       <span class="nx">replace</span><span class="p">(</span><span class="sr">/&#39;/g</span><span class="p">,</span><span class="s1">&#39;&amp;#039;&#39;</span><span class="p">).</span>
+       <span class="nx">replace</span><span class="p">(</span><span class="sr">/&amp;amp;#187;/g</span><span class="p">,</span><span class="s1">&#39;&amp;#187;&#39;</span><span class="p">);</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Like:</p>
+
+  Like this network update</br>
+
+<ul class="star">
+
+<li>  id: id of network update</li>
+
+<li>  doLike:  true (or undefined) if liking, false if unliking</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','like',"UNIU-15003820-5563047074699685888-SHARE");</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">like</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">doLike</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="p">((</span><span class="k">typeof</span> <span class="nx">doLike</span> <span class="o">==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="nx">doLike</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">===</span> <span class="s2">&quot;true&quot;</span><span class="p">))</span> <span class="o">?</span> <span class="s2">&quot;true&quot;</span> <span class="o">:</span> <span class="s2">&quot;false&quot;</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;people/~/network/updates/key=&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s2">&quot;/is-liked&quot;</span><span class="p">,</span> 
+          <span class="nx">body</span><span class="o">:</span> <span class="nx">body</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Comment:</p>
+
+  Comment on this network update</br>
+
+<ul class="star">
+
+<li>  id: id of network update</li>
+
+<li>  comment:  comment</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','comment',"UNIU-15003820-5563047074699685888-SHARE", "This is so cool!");</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">comment</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">comment</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">id</span> <span class="o">||</span> <span class="o">!</span><span class="nx">comment</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;people/~/network/updates/key=&quot;</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s2">&quot;/update-comments&quot;</span><span class="p">,</span> 
+          <span class="nx">body</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="nx">comment</span><span class="o">:</span><span class="nx">comment</span><span class="p">}),</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="c1">// This strips off the media.linkedin.com portion of an image url if it exists to return the original unescapedurl.</span>
+<span class="kd">function</span> <span class="nx">conditionImageUrl</span><span class="p">(</span><span class="nx">imageUrl</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">result</span> <span class="o">=</span> <span class="nx">imageUrl</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">imageUrl</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/media\.linkedin\.com.+?url=(.+)/</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span> <span class="o">=</span> <span class="nx">Querystring</span><span class="p">.</span><span class="nx">unescape</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Share:</p>
+
+  Create a SHAR update:  share content and/or comment to update stream.</br>
+
+<ul class="star">
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    twitter:  if true, additionally post to twitter stream</li>
+
+<li>    visibility "connections" or "anyone" (by default)</li>
+
+<li>    comment</li>
+
+<li>    contentTitle</li>
+
+<li>    contentUrl</li>
+
+<li>    contentImage</li>
+
+<li>    contentId (if re-share, instead of title/url/image)</li>
+
+<div class="block">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','updatesAPI','share',{comment:"simple status update"});</br>
+
+  var api = Lini.api('v1','updatesAPI','share',{contentTitle:"What You Can Learn", contentUrl:"http://www.linkedin.com/today/article?articleID=5562792952759058434&amp;trk=tod-home-art", comment:"set your alarm clocks"});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">share</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// must at least have comment, title/url, or contentId</span>
+  <span class="kd">var</span> <span class="nx">hasContent</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">comment</span> <span class="o">||</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentTitle</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">contentUrl</span><span class="p">)</span> <span class="o">||</span> <span class="nx">options</span><span class="p">.</span><span class="nx">contentId</span><span class="p">));</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasContent</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/shares&quot;</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">twitter</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">twitter</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">===</span> <span class="s2">&quot;true&quot;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?twitter-post=true&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  
+  <span class="kd">var</span> <span class="nx">vis</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">visibility</span> <span class="o">===</span> <span class="s1">&#39;connections&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;connections-only&quot;</span> <span class="o">:</span> <span class="s2">&quot;anyone&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">share</span> <span class="o">=</span> <span class="p">{</span><span class="nx">visibility</span><span class="o">:</span><span class="p">{</span><span class="nx">code</span><span class="o">:</span><span class="nx">vis</span><span class="p">}};</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">comment</span><span class="p">)</span> <span class="nx">share</span><span class="p">.</span><span class="nx">comment</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">comment</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentTitle</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">contentUrl</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">share</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="p">{</span><span class="nx">title</span><span class="o">:</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentTitle</span><span class="p">,</span> <span class="s2">&quot;submitted-url&quot;</span><span class="o">:</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentUrl</span><span class="p">};</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentImage</span><span class="p">)</span> <span class="nx">share</span><span class="p">.</span><span class="nx">content</span><span class="p">[</span><span class="s1">&#39;submitted-image-url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">conditionImageUrl</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentImage</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">share</span><span class="p">.</span><span class="nx">attribution</span> <span class="o">=</span> <span class="p">{</span><span class="nx">share</span><span class="o">:</span><span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="nx">options</span><span class="p">.</span><span class="nx">contentId</span><span class="p">}};</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">articleId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">share</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;article-id&quot;</span><span class="o">:</span><span class="nx">options</span><span class="p">.</span><span class="nx">articleId</span><span class="p">};</span>
+  <span class="p">}</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+          <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
+          <span class="nx">body</span><span class="o">:</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">share</span><span class="p">),</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">UPDATE_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="c1">// ====== PUBLIC ==============================================================</span>
+<span class="kd">var</span> <span class="kr">interface</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">updates</span><span class="o">:</span> <span class="nx">updates</span><span class="p">,</span>
+  <span class="nx">likes</span><span class="o">:</span> <span class="nx">likes</span><span class="p">,</span> 
+  <span class="nx">comments</span><span class="o">:</span> <span class="nx">comments</span><span class="p">,</span>
+  <span class="nx">like</span><span class="o">:</span> <span class="nx">like</span><span class="p">,</span> 
+  <span class="nx">comment</span><span class="o">:</span> <span class="nx">comment</span><span class="p">,</span>
+  <span class="nx">share</span><span class="o">:</span> <span class="nx">share</span>
+<span class="p">};</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kr">interface</span><span class="p">;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

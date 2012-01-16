@@ -1,0 +1,557 @@
+<!DOCTYPE html>  <html> <head>   <title>groupsAPI.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="groupsAPI.html">                 groupsAPI.js               </a>                                           <a class="source" href="industriesAPI.html">                 industriesAPI.js               </a>                                           <a class="source" href="newsAPI.html">                 newsAPI.js               </a>                                           <a class="source" href="peopleAPI.html">                 peopleAPI.js               </a>                                           <a class="source" href="updatesAPI.html">                 updatesAPI.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               groupsAPI.js             </h1>             <span class="section">Comments</section>           </th>           <th class="code">             <h1>&nbsp;</h1>             <span class="section">Code</section>           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <div class="">
+
+<p class="first"></p>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">PersonAPI</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./peopleAPI&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">GROUPS_RESOURCE</span> <span class="o">=</span> <span class="s2">&quot;groups&quot;</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  List:</p>
+
+  Get list of groups.</br>
+
+<ul class="star">
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    fields, eg: ":(group:(id,name,counts-by-category,visibility,large-logo-url,num-members))"</li>
+
+<li>    membership: array of ["owner","member","manager"]; default ["member"]</li>
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','list',{membership:['member'], count:25});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">list</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(group:(id,name,num-members,counts-by-category,small-logo-url,posts:(id,title,relation-to-viewer:(is-liked),creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,likes,comments)))&quot;</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/group-memberships&quot;</span> <span class="o">+</span> <span class="nx">fields</span> <span class="o">+</span> <span class="s2">&quot;?&quot;</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="kd">var</span> <span class="nx">membership</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">membership</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">membership</span> <span class="o">:</span> <span class="p">[</span><span class="s2">&quot;member&quot;</span><span class="p">];</span>
+  <span class="nx">membership</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;membership-state=&#39;</span> <span class="o">+</span> <span class="nx">m</span><span class="p">)});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="p">}</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Recommended:</p>
+
+  Get a list of recommended groups.</br>
+
+<ul class="star">
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    fields, eg: ":(id,name,is-open-to-non-members,counts-by-category)"</li>
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','recommended',{count:5});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">recommended</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(id,name,counts-by-category,is-open-to-non-members,large-logo-url,num-members)&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;people/~/suggestions/groups&quot;</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Show:</p>
+
+  Retrieve details for a group</br>
+
+<ul class="star">
+
+<li>  id: group id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    fields, or ":(id,name)" default</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','show', 547033, {fields:":(id,name)"});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">groupId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">groupId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(id,name,num-members,large-logo-url,is-open-to-non-members,relation-to-viewer:(membership-state))&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="s2">&quot;groups/&quot;</span> <span class="o">+</span> <span class="nx">groupId</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Posts:</p>
+
+  View posts for a given group.</br>
+
+<ul class="star">
+
+<li>  id: group id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    fields</li>
+
+<li>    order (default: recency)</li>
+
+<li>    after (timestamp, such as 1323726382)  milliseconds </li>
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','posts', 547033, {after:1323726382, count:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">posts</span><span class="p">(</span><span class="nx">groupId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">groupId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> 
+    <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> 
+    <span class="s2">&quot;:(id,title,site-group-post-url,attachment,attachments,relation-to-viewer:(is-liked),summary,creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,likes:(person:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),timestamp),comments:(id,creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,text))&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;groups/&quot;</span> <span class="o">+</span> <span class="nx">groupId</span> <span class="o">+</span> <span class="s2">&quot;/posts&quot;</span> <span class="o">+</span> <span class="nx">fields</span> <span class="o">+</span> <span class="s2">&quot;?&quot;</span><span class="p">];</span>
+  
+  <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">,</span><span class="s1">&#39;order&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">after</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;modified-since=&#39;</span> <span class="o">+</span> <span class="nx">options</span><span class="p">.</span><span class="nx">after</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;category=discussion&#39;</span><span class="p">);</span>
+  <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <div class="">
+
+<p class="first">  Join group:</p>
+
+  Become a member of this group.</br>
+
+<ul class="star">
+
+<li>  id: group id</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','joinGroup', 547033);</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">joinGroup</span><span class="p">(</span><span class="nx">groupId</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">groupId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;membership-state&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="o">:</span> <span class="s2">&quot;member&quot;</span><span class="p">}};</span>
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span>
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;people/~/group-memberships/&#39;</span> <span class="o">+</span> <span class="nx">groupId</span><span class="p">,</span>
+          <span class="nx">body</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">body</span><span class="p">),</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <div class="">
+
+<p class="first">  Leave group:</p>
+
+  Revoke membership and leave a group.</br>
+
+<ul class="star">
+
+<li>  id: group id</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','leaveGroup', 547033);</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">leaveGroup</span><span class="p">(</span><span class="nx">groupId</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">groupId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;DELETE&#39;</span><span class="p">,</span>
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;people/~/group-memberships/&#39;</span> <span class="o">+</span> <span class="nx">groupId</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Create Group:</p>
+
+  Create a group</br>
+
+  * options</br>
+
+  - body: hash containing name, category, shortDescription, description, contactEmail, visibility, and isOpenToNonMembers</br>
+
+<div class="block">
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var group = {name:"myGroup",</br>
+
+              category:?,</br>
+
+              description:"blah blah blah", </br>
+
+              shortDescription:"blah", </br>
+
+              contactEmail:"me@linkedin.com",</br>
+
+              visibility:?,</br>
+
+              isOpenToNonMembers:true};</br>
+
+  var api = Lini.api('v1','groupsAPI','createGroup', {body:groups});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">createGroup</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;shortDescription&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;contactEmail&#39;</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">,</span> <span class="s1">&#39;isOpenToNonMembers&#39;</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="p">{</span><span class="nx">visibility</span><span class="o">:</span><span class="p">{</span><span class="nx">code</span><span class="o">:</span><span class="s1">&#39;hidden&#39;</span><span class="p">},</span> <span class="nx">isOpenToNonMembers</span><span class="o">:</span><span class="kc">false</span><span class="p">,</span> <span class="nx">category</span><span class="o">:</span><span class="p">{</span><span class="nx">code</span><span class="o">:</span><span class="s1">&#39;network&#39;</span><span class="p">}};</span>
+  <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">fields</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">body</span><span class="p">[</span><span class="nx">field</span><span class="p">])</span> <span class="p">{</span>
+      <span class="nx">body</span><span class="p">[</span><span class="nx">field</span><span class="p">]</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">body</span><span class="p">[</span><span class="nx">field</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">body</span><span class="p">[</span><span class="nx">field</span><span class="p">])</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;groups&#39;</span><span class="p">,</span>
+          <span class="nx">body</span><span class="o">:</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">body</span><span class="p">),</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Post to group:</p>
+
+  Post a discussion to a group</br>
+
+<ul class="star">
+
+<li>  groupId: group to post to</li>
+
+<li>  title: title of the post</li>
+
+<li>  summary: content of the post</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','postToGroup', 547033, "Check this out...", "Really really interesting comment goes here.");</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">postToGroup</span><span class="p">(</span><span class="nx">groupId</span><span class="p">,</span> <span class="nx">title</span><span class="p">,</span> <span class="nx">summary</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">groupId</span> <span class="o">||</span> <span class="o">!</span><span class="nx">title</span> <span class="o">||</span> <span class="o">!</span><span class="nx">summary</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;groups/&#39;</span> <span class="o">+</span> <span class="nx">groupId</span> <span class="o">+</span> <span class="s1">&#39;/posts&#39;</span><span class="p">,</span>
+          <span class="c1">// body:JSON.stringify({&quot;title&quot;: title, &quot;summary&quot;: summary}),</span>
+          <span class="c1">// headers:{&quot;x-li-format&quot;:&quot;json&quot;, &quot;Content-Type&quot;:&quot;application/json;charset=UTF-8&quot;},</span>
+          <span class="nx">body</span><span class="o">:</span><span class="s1">&#39;&lt;post&gt;&lt;title&gt;&#39;</span> <span class="o">+</span> <span class="nx">title</span> <span class="o">+</span> <span class="s1">&#39;&lt;/title&gt;&lt;summary&gt;&#39;</span> <span class="o">+</span> <span class="nx">summary</span> <span class="o">+</span> <span class="s1">&#39;&lt;/summary&gt;&lt;/post&gt;&#39;</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;text/xml;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="c1">// === POSTS ======================================================================================</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Show Post:</p>
+
+  A Comment made to a group is called a "post".  This method retrieves a posting for viewing.</br>
+
+<ul class="star">
+
+<li>  postId: post id</li>
+
+<li>  options</li>
+
+<ul class="dash">
+
+<li>    fields</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','showPost', 'g-1793367-S-4994574', {fields:":(id,title)"});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">showPost</span><span class="p">(</span><span class="nx">postId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">postId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(id,title,site-group-post-url,attachment,relation-to-viewer:(is-liked),summary,creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,likes:(person:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),timestamp),comments:(id,creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">basicPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,text))&quot;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;posts/&quot;</span> <span class="o">+</span> <span class="nx">postId</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">];</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Post Comments:</p>
+
+  Retrieve comments for a given group posting.</br>
+
+<ul class="star">
+
+<li>  postId: post id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','postComments', 'g-1793367-S-4994574', {count:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">postComments</span><span class="p">(</span><span class="nx">postId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">postId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(id,creator:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),creation-timestamp,text)&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;posts/&#39;</span> <span class="o">+</span> <span class="nx">postId</span> <span class="o">+</span> <span class="s1">&#39;/comments&#39;</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">];</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>  
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span> 
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Post Likes:</p>
+
+  Retrieve list of likes (a list of people who have liked) for a given group posting.</br>
+
+<ul class="star">
+
+<li>  postId: post id</li>
+
+<li>  options:</li>
+
+<ul class="dash">
+
+<li>    start</li>
+
+<li>    count</li>
+
+<div class="">
+
+</ul>
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','postLikes', 'g-1793367-S-4994574', {count:10});</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">postLikes</span><span class="p">(</span><span class="nx">postId</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">postId</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">fields</span> <span class="o">:</span> <span class="s2">&quot;:(person:(&quot;</span> <span class="o">+</span> <span class="nx">PersonAPI</span><span class="p">.</span><span class="nx">standardPersonFields</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;),timestamp)&quot;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;posts/&#39;</span> <span class="o">+</span> <span class="nx">postId</span> <span class="o">+</span> <span class="s1">&#39;/likes&#39;</span> <span class="o">+</span> <span class="nx">fields</span><span class="p">];</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="nx">params</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="o">+</span><span class="s2">&quot;=&quot;</span><span class="o">+</span><span class="nx">options</span><span class="p">[</span><span class="nx">key</span><span class="p">])});</span>  
+    <span class="nx">url</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s2">&quot;?&quot;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">));</span> 
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">headers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">)</span> <span class="o">?</span> <span class="nx">options</span><span class="p">.</span><span class="nx">headers</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">};</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span><span class="nx">url</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">headers</span><span class="o">:</span><span class="nx">headers</span><span class="p">,</span> <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Like Post:</p>
+
+  Either like or unlike a given group posting</br>
+
+<ul class="star">
+
+<li>  postId: post id</li>
+
+<li>  doLike: "true" or "false" (true by default)</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','likePost', 'g-1793367-S-4994574');</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">likePost</span><span class="p">(</span><span class="nx">postId</span><span class="p">,</span> <span class="nx">doLike</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="p">((</span><span class="k">typeof</span> <span class="nx">doLike</span> <span class="o">==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="nx">doLike</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">===</span> <span class="s2">&quot;true&quot;</span><span class="p">))</span> <span class="o">?</span> <span class="s2">&quot;true&quot;</span> <span class="o">:</span> <span class="s2">&quot;false&quot;</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;posts/&#39;</span> <span class="o">+</span> <span class="nx">postId</span> <span class="o">+</span> <span class="s1">&#39;/relation-to-viewer/is-liked&#39;</span><span class="p">,</span>
+          <span class="nx">body</span><span class="o">:</span><span class="nx">body</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;application/json;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <div class="block">
+
+<p class="first">  Comment On Post:</p>
+
+  Submit a comment for this group posting.</br>
+
+<ul class="star">
+
+<li>  postId: post id</li>
+
+<li>  comment</li>
+
+<div class="">
+
+</ul>
+
+<div class="example">  <p class="first">Example:</p>
+
+  var Lini = require('lini');</br>
+
+  var api = Lini.api('v1','groupsAPI','commentOnPost', 'g-1793367-S-4994574'), "I really like this idea!  Ship it.";</br>
+
+</div>
+
+</div>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">function</span> <span class="nx">commentOnPost</span><span class="p">(</span><span class="nx">postId</span><span class="p">,</span> <span class="nx">comment</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">postId</span> <span class="o">||</span> <span class="o">!</span><span class="nx">comment</span><span class="p">)</span> <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
+  
+  <span class="k">return</span> <span class="p">{</span><span class="nx">method</span><span class="o">:</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> 
+          <span class="nx">path</span><span class="o">:</span><span class="s1">&#39;posts/&#39;</span> <span class="o">+</span> <span class="nx">postId</span> <span class="o">+</span> <span class="s1">&#39;/comments&#39;</span><span class="p">,</span>
+          <span class="nx">body</span><span class="o">:</span><span class="s1">&#39;&lt;comment&gt;&lt;text&gt;&#39;</span> <span class="o">+</span> <span class="nx">comment</span> <span class="o">+</span> <span class="s1">&#39;&lt;/text&gt;&lt;/comment&gt;&#39;</span><span class="p">,</span>
+          <span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;x-li-format&quot;</span><span class="o">:</span><span class="s2">&quot;xml&quot;</span><span class="p">,</span> <span class="s2">&quot;Content-Type&quot;</span><span class="o">:</span><span class="s2">&quot;text/xml;charset=UTF-8&quot;</span><span class="p">},</span>
+          <span class="c1">// body:JSON.stringify({text:comment}),</span>
+          <span class="c1">// headers:{&quot;x-li-format&quot;:&quot;json&quot;, &quot;Content-Type&quot;:&quot;application/json;charset=UTF-8&quot;},</span>
+          <span class="nx">resource</span><span class="o">:</span><span class="nx">GROUPS_RESOURCE</span><span class="p">};</span>
+<span class="p">}</span>
+
+
+<span class="c1">// ====== PUBLIC ==============================================================</span>
+<span class="kd">var</span> <span class="kr">interface</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">list</span><span class="o">:</span> <span class="nx">list</span><span class="p">,</span>
+  <span class="nx">recommended</span><span class="o">:</span> <span class="nx">recommended</span><span class="p">,</span>
+  <span class="nx">show</span><span class="o">:</span> <span class="nx">show</span><span class="p">,</span>
+  <span class="nx">posts</span><span class="o">:</span> <span class="nx">posts</span><span class="p">,</span>
+  <span class="nx">showPost</span><span class="o">:</span> <span class="nx">showPost</span><span class="p">,</span>
+  <span class="nx">postComments</span><span class="o">:</span> <span class="nx">postComments</span><span class="p">,</span>
+  <span class="nx">postLikes</span><span class="o">:</span> <span class="nx">postLikes</span><span class="p">,</span>
+  <span class="nx">joinGroup</span><span class="o">:</span> <span class="nx">joinGroup</span><span class="p">,</span>
+  <span class="nx">leaveGroup</span><span class="o">:</span> <span class="nx">leaveGroup</span><span class="p">,</span>
+  <span class="nx">likePost</span><span class="o">:</span> <span class="nx">likePost</span><span class="p">,</span>
+  <span class="nx">createGroup</span><span class="o">:</span> <span class="nx">createGroup</span><span class="p">,</span>
+  <span class="nx">postToGroup</span><span class="o">:</span> <span class="nx">postToGroup</span><span class="p">,</span>
+  <span class="nx">commentOnPost</span><span class="o">:</span> <span class="nx">commentOnPost</span>
+<span class="p">};</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kr">interface</span><span class="p">;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
