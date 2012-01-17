@@ -32,9 +32,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','list',{membership:['member'], count:25});</br>
+  var api = Lin.api('v1','groupsAPI','list',{membership:['member'], count:25});</br>
 
 </div>
 
@@ -78,9 +78,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','recommended',{count:5});</br>
+  var api = Lin.api('v1','groupsAPI','recommended',{count:5});</br>
 
 </div>
 
@@ -119,9 +119,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','show', 547033, {fields:":(id,name)"});</br>
+  var api = Lin.api('v1','groupsAPI','show', 547033, {fields:":(id,name)"});</br>
 
 </div>
 
@@ -163,9 +163,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','posts', 547033, {after:1323726382, count:10});</br>
+  var api = Lin.api('v1','groupsAPI','posts', 547033, {after:1323726382, count:10});</br>
 
 </div>
 
@@ -205,9 +205,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','joinGroup', 547033);</br>
+  var api = Lin.api('v1','groupsAPI','joinGroup', 547033);</br>
 
 </div>
 
@@ -236,9 +236,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','leaveGroup', 547033);</br>
+  var api = Lin.api('v1','groupsAPI','leaveGroup', 547033);</br>
 
 </div>
 
@@ -263,7 +263,7 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
   var group = {name:"myGroup",</br>
 
@@ -279,7 +279,7 @@
 
               isOpenToNonMembers:true};</br>
 
-  var api = Lini.api('v1','groupsAPI','createGroup', {body:groups});</br>
+  var api = Lin.api('v1','groupsAPI','createGroup', {body:groups});</br>
 
 </div>
 
@@ -318,9 +318,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','postToGroup', 547033, "Check this out...", "Really really interesting comment goes here.");</br>
+  var api = Lin.api('v1','groupsAPI','postToGroup', 547033, "Check this out...", "Really really interesting comment goes here.");</br>
 
 </div>
 
@@ -361,9 +361,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','showPost', 'g-1793367-S-4994574', {fields:":(id,title)"});</br>
+  var api = Lin.api('v1','groupsAPI','showPost', 'g-1793367-S-4994574', {fields:":(id,title)"});</br>
 
 </div>
 
@@ -401,9 +401,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','postComments', 'g-1793367-S-4994574', {count:10});</br>
+  var api = Lin.api('v1','groupsAPI','postComments', 'g-1793367-S-4994574', {count:10});</br>
 
 </div>
 
@@ -447,9 +447,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','postLikes', 'g-1793367-S-4994574', {count:10});</br>
+  var api = Lin.api('v1','groupsAPI','postLikes', 'g-1793367-S-4994574', {count:10});</br>
 
 </div>
 
@@ -485,9 +485,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','likePost', 'g-1793367-S-4994574');</br>
+  var api = Lin.api('v1','groupsAPI','likePost', 'g-1793367-S-4994574');</br>
 
 </div>
 
@@ -517,9 +517,9 @@
 
 <div class="example">  <p class="first">Example:</p>
 
-  var Lini = require('lini');</br>
+  var Lin = require('lin');</br>
 
-  var api = Lini.api('v1','groupsAPI','commentOnPost', 'g-1793367-S-4994574'), "I really like this idea!  Ship it.";</br>
+  var api = Lin.api('v1','groupsAPI','commentOnPost', 'g-1793367-S-4994574'), "I really like this idea!  Ship it.";</br>
 
 </div>
 
